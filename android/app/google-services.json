@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "828433291493",
+    "project_id": "todoapp-ndeva",
+    "storage_bucket": "todoapp-ndeva.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828433291493:android:a1ead2a98081425e2b9c0c",
+        "android_client_info": {
+          "package_name": "com.todoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "828433291493-g722p2a6sdqsromnn8o70cni834iqb94.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjwFwQTwYj9at-zCeGXdRj-xRr-rPDZro"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "828433291493-g722p2a6sdqsromnn8o70cni834iqb94.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
