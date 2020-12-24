@@ -4,7 +4,7 @@ import React, { Component, useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Text, Platform } from 'react-native'
 import BottomSheet from './BottomSheet'
 import {
-    TimePicker
+    TimePicker, DatePicker
 } from "react-native-wheel-picker-android";
 
 
@@ -21,9 +21,15 @@ const propsType = {
     show: Boolean,
 }
 
-const DatePicker = (props = propsType) => {
+const TimePickerCustom = (props = propsType) => {
 
     const [time, setTime] = useState(new Date())
+    const [minData, setMinData] = useState([])
+    useEffect(() => {
+        const dataMin = []
+        for(var i = 0; i < 60 ; i ++)dataMin.push(i.toString())
+        setMinData(dataMin)
+    },[])
 
 
     return (
@@ -42,7 +48,7 @@ const DatePicker = (props = propsType) => {
             placeHolder={props.placeHolder ? props.placeHolder : null}
             children={
                 <View style={{ flex: 1 }}>
-                    <TimePicker onTimeSelected={setTime} format24 = {false} />
+                    <TimePicker onTimeSelected={setTime} format24 = {false} minutes = {minData}  />
                 </View>
             }
         />
@@ -67,4 +73,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default DatePicker
+export default TimePickerCustom

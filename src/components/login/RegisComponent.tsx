@@ -3,33 +3,54 @@ import { StatusBar, StyleSheet, View, ScrollView, Text, TextInput, TouchableOpac
 import size from '../../res/assert/size'
 import auth from '@react-native-firebase/auth';
 import { useSelector, useDispatch } from 'react-redux';
-import {sendRegisAction} from '../../redux/actions/loginActions/login'
+import {sendRegisAction, sendRegisResetAction} from '../../redux/actions/loginActions/login'
 import Loading from '../custom/Loading'
+import AlertModal from '../custom/AlertModal'
+import Icon from 'react-native-vector-icons/MaterialIcons'
 const screen = Dimensions.get('screen')
 
 const RegisComponent: React.FC = (props: any) => {
   const {navigation} = props
-  const user = useSelector((state: any) => state.regisReducer.user);
+  const status = useSelector((state: any) => state.regisReducer.status);
+  const messageReducer = useSelector((state: any) => state.regisReducer.message);
   const loading = useSelector((state: any) => state.regisReducer.loading);
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-
+  const [message, setMessage] = useState('')
   const dispatch = useDispatch();
   const postRegis = () => {dispatch(sendRegisAction(username,email,password))}
-
+  const resetRegis = () => {dispatch(sendRegisResetAction())}
   const onLogin = () => {
-    if(!email || !password) return
+    if(!email || !password || !username){
+      setMessage('Please fill the form!')
+      return
+    }
     postRegis()
   }
   useEffect(() => {
-    if(user)props.navigation.goBack()
+    if(status == 'SUCCESS'){
+      resetRegis()
+      props.navigation.goBack()
+    }
+    if(status == 'FAIL'){
+      setMessage(messageReducer)
+    }
   })
   return (
     <View style = {styles.content}>
       <StatusBar translucent = {true} barStyle = 'dark-content' backgroundColor = 'transparent' />
       {loading && <Loading />}
+      <AlertModal
+        type = 'alert'
+        show = {message ? true : false}
+        message = {message}
+        onClose = {() => {resetRegis(); setMessage('')}}
+      />
       <KeyboardAvoidingView style = {{flex: 1}} behavior = 'padding' keyboardVerticalOffset = {-size.s340}>
+      <TouchableOpacity style = {styles.backBtn} onPress = {() => navigation.goBack()}>
+        <Icon name = 'arrow-back' size = {size.s60} color = 'grey' />
+      </TouchableOpacity>
       <ScrollView contentContainerStyle = {{flex: 1}} >
           <View style = {styles.body}>
             <TextInput 
@@ -86,6 +107,13 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: 'OpenSans-Regular'
+  },
+  backBtn: {
+    position: 'absolute',
+    top: size.s100,
+    left: size.s40,
+    padding: size.s10,
+    zIndex: 1
   }
 })
 export default RegisComponent

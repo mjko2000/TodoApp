@@ -18,7 +18,7 @@ const AddTaskModal: React.FC = (props: any) => {
   const [toTime, setToTime] = useState(new Date())
   const [rate, setRate] = useState(0)
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState()
+  const [message, setMessage] = useState('')
   const [isAlert, setAlert] = useState(false)
   const onAddTask = async () => {
     setLoading(true)
@@ -29,7 +29,7 @@ const AddTaskModal: React.FC = (props: any) => {
     }
     try{
       const data = {
-        id: '',
+        id: fromTime.getTime()+'',
         title: title,
         note: note,
         time: new Date(),
@@ -39,8 +39,9 @@ const AddTaskModal: React.FC = (props: any) => {
         status: 0,
         isAlert: false
       }
+      console.log(data.time.toISOString())
       const result = await addTaskDone(data)
-      isAlert && addNotification(result.id,new Date(fromTime - 1000*60*30),"Your task "+data.title+" is coming time!")
+      isAlert && addNotification(data.id,new Date(fromTime - 1000*60*30),"Your task "+data.title+" is coming time!")
       setNote('')
       setTitle('')
       onClose()
@@ -144,9 +145,12 @@ const TimeSelector = (props: any) => {
         }
         onSelect = {res => {
           const newDate = new Date(time)
+          newDate.setMilliseconds(new Date().getMilliseconds())
+          newDate.setSeconds(new Date().getSeconds())
           newDate.setHours(res?.hour)
           newDate.setMinutes(res?.min)
           setTime(newDate)
+          console.log(newDate.getMilliseconds(), newDate.getSeconds())
         }}
       />
     </View>

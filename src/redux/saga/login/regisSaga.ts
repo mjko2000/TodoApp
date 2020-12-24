@@ -10,13 +10,13 @@ function* regisFlow(action: any) {
     try {
         const response = yield auth().createUserWithEmailAndPassword(action.data.email, action.data.password)
           .then(value =>  value.user )
-        response.user.updateProfile({displayName: action.data.username});
+          console.log(action.data.username)
+        yield response.updateProfile({displayName: action.data.username});
         auth().signOut()
         console.log(response, "response REGIS")
-        yield put({ type: SEND_REGIS_SUCCESS, data: response });
+        yield put({ type: SEND_REGIS_SUCCESS, data: {status: "SUCCESS", message: "Complete"} });
     } catch (error) {
-        console.log(error, 'errrr')
-        yield put({ type: SEND_REGIS_ERR, data: error });
+        yield put({ type: SEND_REGIS_ERR, data: {status: "FAIL", message: error.message} });
     }
 }
 

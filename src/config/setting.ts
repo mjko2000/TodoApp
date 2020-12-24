@@ -2,5 +2,6 @@ export var userData = {
   id: '',
   username: '',
   email: '',
-  avatar: ''
+  avatar: '',
+  photoURL: ''
 }

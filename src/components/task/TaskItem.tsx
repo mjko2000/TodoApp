@@ -110,11 +110,12 @@ const timeToText = (time: any) => {
   const fromTime = new Date(time);
   const nowDate = new Date();
   const timeTamp = fromTime.getTime() - nowDate.getTime()
-  if (timeTamp / 1000 / 60 / 60 > 0 && timeTamp / 1000 / 60 / 60 < 24) return ('Hôm nay')
-  if (timeTamp / 1000 / 60 / 60 > 0 && timeTamp / 1000 / 60 / 60 / 24 < 2) return ('Ngày mai')
+  if (timeTamp / 1000 / 60 / 60 > 0 && timeTamp / 1000 / 60 / 60 < 24) return ('Today')
+  if (timeTamp / 1000 / 60 / 60 > 0 && timeTamp / 1000 / 60 / 60 / 24 < 2) return ('Tomorow')
   var dd = String(fromTime.getDate()).padStart(2, '0');
   var mm = String(fromTime.getMonth() + 1).padStart(2, '0');
   var yyyy = fromTime.getFullYear();
+  if (timeTamp / 1000 / 60 / 60 < 0) return ('Passed, day: ' + dd + '/' + mm + '/' + yyyy)
   return dd + '/' + mm + '/' + yyyy;
 }
 

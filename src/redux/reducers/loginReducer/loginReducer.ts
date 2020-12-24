@@ -1,7 +1,7 @@
 import {
   SEND_LOGIN, SEND_LOGIN_SUCCESS,
   SEND_LOGOUT, SEND_LOGIN_ERR, SEND_LOGOUT_SUCCESS,
-  SEND_REGIS, SEND_REGIS_ERR, SEND_REGIS_SUCCESS, RETSET_LOGIN
+  SEND_REGIS, SEND_REGIS_ERR, SEND_REGIS_SUCCESS, RETSET_LOGIN, SEND_REGIS_RESET
 } from '../../actions/loginActions/login'
 import {userData} from '../../../config/setting'
 const initLogin = {
@@ -39,8 +39,8 @@ export function loginReducer(state = initLogin, action: any) {
 
 const initRegis = {
   loggedIn: false,
-  user: null,
-  error: '',
+  status: null,
+  message: '',
   loading: false
 }
 
@@ -49,9 +49,11 @@ export function regisReducer(state = initRegis, action: any) {
     case SEND_REGIS:
       return { ...state, loading: true }
     case SEND_REGIS_SUCCESS:
-      return { ...state, user: action.data, loading: false }
+      return { ...state, status: action.data.status, message: action.data.message, loading: false }
     case SEND_REGIS_ERR:
-      return { ...state, error: action.data, loading: false }
+      return { ...state, status: action.data.status, message: action.data.message, loading: false }
+    case SEND_REGIS_RESET:
+      return initRegis
     default:
       return state
   }

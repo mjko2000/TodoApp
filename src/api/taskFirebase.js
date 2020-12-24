@@ -2,7 +2,7 @@ import firestore from '@react-native-firebase/firestore';
 import {userData} from '../config/setting'
 
 export const addTaskDone = (data) => {
-  return firestore().collection('users').doc(userData.email).collection('tasks').add(data)
+  return firestore().collection('users').doc(userData.email).collection('tasks').doc(data.time?.getTime().toString()).set(data)
 }
 
 // export const getListDoneTasks = () => {
@@ -16,7 +16,7 @@ export const getListDoneTasks = (setData,orderBy) => {
     })
     switch(orderBy){
       case 'timeCreate': data.sort((a,b) => a.time - b.time);break
-      case 'fromTime': data.sort((a,b) => a.fromTime - b.fromTime);break
+      case 'fromTime': data.sort((a,b) => b.fromTime - a.fromTime);break
       case 'rate': data.sort((a,b) => b.rate - a.rate);break
       case 'status': data.sort((a,b) => b.status - a.status);break
     }
@@ -27,6 +27,7 @@ export const getListDoneTasks = (setData,orderBy) => {
 export const getListUnDoneTasks = (setData,orderBy) => {
   return firestore().collection('users').doc(userData.email).collection('tasks').where('status','<', 2).onSnapshot(snap => {
     const data = snap.docs.map(item => {
+      console.log(item.data().title)
       return {...item.data(), id: item.id}
     })
     switch(orderBy){
