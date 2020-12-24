@@ -3,19 +3,22 @@ import { StatusBar, StyleSheet, View, ScrollView, Text, TextInput, TouchableOpac
 import size from '../../res/assert/size'
 import auth from '@react-native-firebase/auth';
 import { useSelector, useDispatch } from 'react-redux';
-import {sendLoginAction} from '../../redux/actions/loginActions/login'
+import {sendLoginAction, resetLoginAction} from '../../redux/actions/loginActions/login'
 import AlertModal from '../custom/AlertModal'
-
+import Loading from '../custom/Loading'
 const screen = Dimensions.get('screen')
 
 const LoginComponent: React.FC = (props: any) => {
   const {navigation} = props
   const user = useSelector((state: any) => state.loginReducer.user)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const message = useSelector((state: any) => state.loginReducer.error)
+  const loading = useSelector((state: any) => state.loginReducer.loading)
+  const [email, setEmail] = useState('one.evething@gmail.com')
+  const [password, setPassword] = useState('123123')
 
   const dispatch = useDispatch();
   const postLogin = () => {dispatch(sendLoginAction(email,password)); console.log('sss')}
+  const resetLogin = () => {dispatch(resetLoginAction()); console.log('sss')}
 
   const onLogin = () => {
     if(!email || !password) return
@@ -23,23 +26,29 @@ const LoginComponent: React.FC = (props: any) => {
   }
   useEffect(() => {
     // navigation.navigate('Route')
-    if(user)navigation.navigate('Route')
+    if(user)navigation.replace('Route')
     // setUser(null)
   })
   return (
     <View style = {styles.content}>
       <StatusBar translucent = {true} barStyle = 'dark-content' backgroundColor = 'transparent' />
       <AlertModal
-        show = {true}
+        type = 'alert'
+        show = {message ? true : false}
+        message = {message}
+        onClose = {resetLogin}
       />
+      {loading && <Loading />}
       <KeyboardAvoidingView style = {{flex: 1}} behavior = 'padding' keyboardVerticalOffset = {-size.s340}>
       <ScrollView contentContainerStyle = {{flex: 1}} >
           <View style = {styles.body}>
-            <TextInput 
+            <TextInput
+              value = {email}
               style = {styles.input} placeholder = 'Email' 
               onChangeText = {setEmail} placeholderTextColor = '#00000020' 
             />
-            <TextInput 
+            <TextInput
+              value = {password}
               style = {styles.input} placeholderTextColor = '#00000020'
               placeholder = 'Password' onChangeText = {setPassword} secureTextEntry = {true}
             />

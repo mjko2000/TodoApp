@@ -4,12 +4,13 @@ import size from '../../res/assert/size'
 import auth from '@react-native-firebase/auth';
 import { useSelector, useDispatch } from 'react-redux';
 import {sendRegisAction} from '../../redux/actions/loginActions/login'
-
+import Loading from '../custom/Loading'
 const screen = Dimensions.get('screen')
 
 const RegisComponent: React.FC = (props: any) => {
   const {navigation} = props
   const user = useSelector((state: any) => state.regisReducer.user);
+  const loading = useSelector((state: any) => state.regisReducer.loading);
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -22,11 +23,12 @@ const RegisComponent: React.FC = (props: any) => {
     postRegis()
   }
   useEffect(() => {
-    // if(user)props.navigation.navigate('Route')
+    if(user)props.navigation.goBack()
   })
   return (
     <View style = {styles.content}>
       <StatusBar translucent = {true} barStyle = 'dark-content' backgroundColor = 'transparent' />
+      {loading && <Loading />}
       <KeyboardAvoidingView style = {{flex: 1}} behavior = 'padding' keyboardVerticalOffset = {-size.s340}>
       <ScrollView contentContainerStyle = {{flex: 1}} >
           <View style = {styles.body}>

@@ -6,7 +6,7 @@ import images from '../../res/image'
 const propType = {
     show: Boolean,
     title: String,
-    type: "alert" | "option",
+    type: String | "alert" | "option",
     message: String,
     onClose: () => { },
     headerStyle: Object,

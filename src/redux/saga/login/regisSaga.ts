@@ -9,7 +9,8 @@ function* regisFlow(action: any) {
     console.log('asasdadasd',action)
     try {
         const response = yield auth().createUserWithEmailAndPassword(action.data.email, action.data.password)
-          .then(value => value.user.updateProfile({displayName: action.data.username}))
+          .then(value =>  value.user )
+        response.user.updateProfile({displayName: action.data.username});
         auth().signOut()
         console.log(response, "response REGIS")
         yield put({ type: SEND_REGIS_SUCCESS, data: response });

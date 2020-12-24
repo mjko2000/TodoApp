@@ -14,7 +14,7 @@ function* loginFlow(action: any) {
         yield put({ type: SEND_LOGIN_SUCCESS, data: response });
     } catch (error) {
         console.log(error, 'errrr')
-        yield put({ type: SEND_LOGIN_ERR, data: error });
+        yield put({ type: SEND_LOGIN_ERR, data: "Lỗi đăng nhập" });
     }
 }
 
@@ -26,7 +26,7 @@ function* logoutFlow(action: any) {
         yield put({ type: SEND_LOGOUT_SUCCESS, data: response });
     } catch (error) {
         console.log(error, 'errrr')
-        yield put({ type: SEND_LOGOUT_SUCCESS, data: error });
+        yield put({ type: SEND_LOGOUT_SUCCESS, data: "error" });
     }
 }
 

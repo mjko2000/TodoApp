@@ -16,7 +16,10 @@ const Profile = (props) => {
   const onLogout = () => dispatch(sendLogout())
 
   useEffect(() => {
-    if(!user)props.navigation.navigate('Login')
+    if(!user)props.navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
   })
   return (
     <View style = {styles.content}>
@@ -43,7 +46,7 @@ const Profile = (props) => {
 const styles = StyleSheet.create({
   content: {
     flex:1,
-    backgroundColor: '#dbdbdb',
+    backgroundColor: 'white',
   },
   header: {
     paddingVertical: size.s20,
