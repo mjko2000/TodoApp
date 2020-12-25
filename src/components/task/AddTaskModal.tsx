@@ -50,7 +50,7 @@ const AddTaskModal: React.FC = (props: any) => {
     }
     try{
       const data = {
-        id: new Date().getTime(),
+        id: new Date().getTime()+'',
         title: title,
         note: note,
         time: new Date().getTime(),
