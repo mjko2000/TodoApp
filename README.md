@@ -5,7 +5,7 @@ Các chức năng hiện có:
 - Lưu trữ Tasks local (Offline mode).
 - Thay đổi ảnh đại diện online.
 - Ghi nhớ mật khẩu với Keychain.
-
+- Notification thông báo sắp đến task.
 Task: 
 - Thêm, xóa, sửa tasks.
 - Bật thông báo notification trước 30 phút cho task (On/Off).
