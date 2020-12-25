@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { StatusBar, StyleSheet, View, FlatList,  TouchableOpacity } from 'react-native'
 import size from '../../res/assert/size'
 import TaskItem from './TaskItem'
@@ -6,12 +6,16 @@ import Icon from 'react-native-vector-icons/FontAwesome5'
 import AddTaskModal from './AddTaskModal'
 
 const Task: React.FC = (props: any) => {
-  const {add, data} = props
+  const {add, data, onRefresh} = props
   const [showAdd, setShowAdd] = useState(false)
   const [isRefresh, setRefresh] = useState(false)
+  const [focus, setFocus] = useState()
   useEffect(() => {
     isRefresh && setRefresh(false)
   })
+  useEffect(() => {
+    focus ? setShowAdd(true): setShowAdd(false)
+  },[focus])
   return (
     <View style = {styles.content}>
       {add && 
@@ -25,13 +29,19 @@ const Task: React.FC = (props: any) => {
       <AddTaskModal 
         show = {showAdd}
         setShow = {setShowAdd}
-        onClose = {() => setShowAdd(false)}
+        onClose = {() => {
+          setShowAdd(false)
+          setFocus(null)
+        }}
+        onRefresh = {onRefresh}
+        data = {focus}
       />
       <FlatList
         style = {styles.listStyle}
         data = {data}
-        keyExtractor = {(item, index) => item.id}
-        renderItem = {({item,index}) => <TaskItem {...item} />}
+        extraData = {data}
+        keyExtractor = {(item, index) => index.toString()}
+        renderItem = {({item,index}) => <TaskItem data = {item} index = {index} onRefresh = {onRefresh} setFocus = {() => setFocus(item)} />}
         ListHeaderComponent = {() => <View style = {{marginTop: size.s40}} />}
         refreshing = {isRefresh}
         onRefresh = {() => {

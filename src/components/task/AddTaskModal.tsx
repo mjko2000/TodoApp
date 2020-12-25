@@ -2,24 +2,45 @@ import React, { useEffect, useState } from 'react'
 import { View, TouchableOpacity, StyleSheet, Text, ScrollView,Switch } from 'react-native'
 import BottomSheet from '../custom/BottomSheet'
 import size from '../../res/assert/size'
-import { addTaskDone } from '../../api/taskFirebase'
+import { addTaskDone, editTask } from '../../api/taskFirebase'
 import { TextInput, RadioButton, Button } from 'react-native-paper'
 import TimePicker from '../custom/TimePicker'
 import Icon from 'react-native-vector-icons/FontAwesome5'
 import DatePicker from '../custom/DatePicker'
 import AlertModal from '../custom/AlertModal'
 import {addNotification} from '../../Notification'
+import { storeTaskUndoneLocal , editLocalTask} from '../../api/getTaskLocal'
+import { connect } from '../../config/setting'
 
 const AddTaskModal: React.FC = (props: any) => {
-  const { show, onClose } = props
+  const { show, onClose, data, onRefresh } = props
   const [title, setTitle] = useState('')
   const [note, setNote] = useState('')
-  const [fromTime, setFromTime] = useState(new Date())
-  const [toTime, setToTime] = useState(new Date())
+  const [fromTime, setFromTime] = useState(new Date().getTime())
+  const [toTime, setToTime] = useState(new Date().getTime())
   const [rate, setRate] = useState(0)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [isAlert, setAlert] = useState(false)
+  const [id, setID] = useState()
+  const [time, setTime] = useState()
+  useEffect(() => {
+    if(data){
+      setTitle(data.title)
+      setNote(data.note)
+      setFromTime(data.fromTime)
+      setToTime(data.toTime)
+      setRate(data.rate)
+      setAlert(data.isAlert)
+      setID(data.id)
+      setTime(data.time)
+    }else{
+      setTitle('')
+      setNote('')
+      setFromTime(new Date().getTime())
+      setToTime(new Date().getTime())
+    }
+  },[data])
   const onAddTask = async () => {
     setLoading(true)
     if(!title || !note){
@@ -29,21 +50,55 @@ const AddTaskModal: React.FC = (props: any) => {
     }
     try{
       const data = {
-        id: fromTime.getTime()+'',
+        id: new Date().getTime(),
         title: title,
         note: note,
-        time: new Date(),
-        fromTime: fromTime,
-        toTime: toTime,
+        time: new Date().getTime(),
+        fromTime: fromTime.getTime ? fromTime.getTime() : fromTime,
+        toTime: toTime.getTime ? toTime.getTime() : toTime,
         rate: rate,
         status: 0,
-        isAlert: false
+        isAlert: isAlert
       }
-      console.log(data.time.toISOString())
-      const result = await addTaskDone(data)
+      if(connect.type == 'local'){
+        await storeTaskUndoneLocal(data)
+        onRefresh()
+      }else{
+        await addTaskDone(data)
+      }
       isAlert && addNotification(data.id,new Date(fromTime - 1000*60*30),"Your task "+data.title+" is coming time!")
       setNote('')
       setTitle('')
+      onClose()
+    }catch(err){
+      console.log(err)
+    }
+    setLoading(false)
+  }
+  const onEditTask = async () => {
+    setLoading(true)
+    try{
+      const data = {
+        id: id,
+        title: title,
+        note: note,
+        time: time.getTime ? time.getTime() : time,
+        fromTime: fromTime.getTime ? fromTime.getTime() : fromTime,
+        toTime: toTime.getTime ? toTime.getTime() : toTime,
+        rate: rate,
+        status: 0,
+        isAlert: isAlert
+      }
+      if(connect.type == 'local'){
+        await editLocalTask(data)
+        onRefresh()
+      }else{
+        await editTask(data)
+      }
+      setNote('')
+      setTitle('')
+      setFromTime(new Date().getTime())
+      setToTime(new Date().getTime())
       onClose()
     }catch(err){
       console.log(err)
@@ -68,10 +123,12 @@ const AddTaskModal: React.FC = (props: any) => {
           />
           <Text style={styles.headerText}>Add task</Text>
           <TextInput
+            value = {title}
             style={styles.inputField} mode='flat'
             label="Title" onChangeText={setTitle}
           />
           <TextInput
+            value = {note}
             style={styles.inputField} mode='flat'
             label="Note" onChangeText={setNote}
           />
@@ -95,12 +152,12 @@ const AddTaskModal: React.FC = (props: any) => {
             />
           </View>
           <Button 
-            icon="camera" mode="contained" 
-            onPress={() => onAddTask()}
+            icon="check" mode="contained" 
+            onPress={() => data ? onEditTask() : onAddTask()}
             loading = {loading}
             disabled = {loading}
           >
-            Press me
+            Done
           </Button>
         </ScrollView>
       }
@@ -109,7 +166,8 @@ const AddTaskModal: React.FC = (props: any) => {
 }
 
 const TimeSelector = (props: any) => {
-  const {time, setTime} = props
+  const {setTime} = props
+  const time = new Date(props.time)
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: size.s20 }}>
       <DatePicker

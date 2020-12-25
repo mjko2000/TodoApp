@@ -7,6 +7,9 @@ import { Avatar, ProgressBar } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import {uploadAvatar, getDownloadURL} from '../../api/userFirebase'
 import ImagePicker from '../custom/ImagePickerCustom'
+import { connect } from '../../config/setting';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain';
 
 const screen = Dimensions.get('screen')
 
@@ -20,11 +23,18 @@ const Profile = (props) => {
   const onLogout = () => dispatch(sendLogout())
 
   useEffect(() => {
-    if(!user)props.navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
+    checkLogout()
   })
+  const checkLogout = async() => {
+    if(!user && connect.type == 'online'){
+      await Keychain.resetGenericPassword();
+      await AsyncStorage.removeItem('remember')
+      props.navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    }
+  }
   return (
     <View style = {styles.content}>
       <View style = {styles.header}>
@@ -59,11 +69,23 @@ const Profile = (props) => {
           <Text>{user?.email}</Text>
         </View>
       </View>
+      {connect.type == 'online' ? 
       <TouchableOpacity
         onPress = {() => onLogout()}
         style = {styles.logout}>
         <Text style = {styles.userText}>Logout</Text>
+      </TouchableOpacity> :
+      <TouchableOpacity
+        onPress = {() => {
+          props.navigation.reset({
+            index: 0,
+            routes: [{ name: 'Login' }],
+          })
+        }}
+        style = {[styles.logout, {backgroundColor: '#03b1fc'}]}>
+        <Text style = {styles.userText}>Login</Text>
       </TouchableOpacity>
+      }
     </View>
   )
 }

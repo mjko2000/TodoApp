@@ -8,6 +8,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import BottomSheet from '../custom/BottomSheet'
 import { RadioButton, Button, IconButton } from 'react-native-paper'
 import {getListUnDoneTasks, getListDoneTasks} from '../../api/taskFirebase'
+import {getListUndoneLocal, getListDoneLocal} from '../../api/getTaskLocal'
+import { connect } from '../../config/setting';
 const Tab = createMaterialTopTabNavigator()
 
 const TaskContainer: React.FC = (props: any) => {
@@ -18,15 +20,24 @@ const TaskContainer: React.FC = (props: any) => {
   const [subscribe, setSubscribe] = useState({unsubscribe: () => {}})
   const [subscribe1, setSubscribe1] = useState({unsubscribe: () => {}})
   useEffect(() => {
+    
     getDoneTask()
     getUnDoneTasks()
   },[orderBy])
   const getDoneTask = async () => {
+    if(connect.type == 'local'){
+      getListDoneLocal(setDoneList, orderBy)
+      return
+    }
     subscribe.unsubscribe && subscribe.unsubscribe()
     const result = await getListUnDoneTasks(setUnDoneList,orderBy)
     setSubscribe({unsubscribe: result})
   }
   const getUnDoneTasks = async () => {
+    if(connect.type == 'local'){
+      getListUndoneLocal(setUnDoneList, orderBy)
+      return
+    }
     subscribe1.unsubscribe && subscribe1.unsubscribe()
     const result = await getListDoneTasks(setDoneList,orderBy)
     setSubscribe1({unsubscribe: result})
@@ -50,7 +61,10 @@ const TaskContainer: React.FC = (props: any) => {
         </TouchableOpacity>
       </View>
       <Tab.Navigator>
-        <Tab.Screen name="Ongoing Task" children = {(props) => <TaskComponent {...props} data = {unDoneList} add = {true} />} />
+        <Tab.Screen name="Ongoing Task" children = {(props) => <TaskComponent {...props} data = {unDoneList} add = {true} onRefresh = {() => {
+          getDoneTask()
+          getUnDoneTasks()
+        }} />} />
         <Tab.Screen name="Done Task" children = {(props) => <TaskComponent {...props} data = {doneList} />} add = {false} />
       </Tab.Navigator>
     </View>

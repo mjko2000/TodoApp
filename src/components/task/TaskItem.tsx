@@ -4,12 +4,15 @@ import size from '../../res/assert/size'
 import { useSelector, useDispatch } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import {deleteTask, changeStatus} from '../../api/taskFirebase'
+import {changeStatusLocal, deleteLocalTask} from '../../api/getTaskLocal'
 import {removeNotification} from '../../Notification'
+import { connect } from '../../config/setting';
 const AnimatedTouch = Animated.createAnimatedComponent(TouchableOpacity)
 const Task: React.FC = (props: any) => {
-  const { title, id, fromTime, toTime, time, rate, note, status } = props
-  const fromDate = new Date(fromTime?.seconds*1000)
-  const toDate = new Date(toTime?.seconds*1000)
+  const {index, onRefresh, setFocus} = props
+  const { title, id, fromTime, toTime, time, rate, note, status  } = props.data
+  const fromDate = new Date(fromTime)
+  const toDate = new Date(toTime)
   const user = useSelector((state: any) => state.loginReducer.user);
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false)
@@ -33,10 +36,10 @@ const Task: React.FC = (props: any) => {
     })
   }
 
+
   return (
     <AnimatedTouch
       onPress = {() => bounce()}
-      // onPressIn={() => bounce()}
       style={[styles.container, { transform: [{ scale: animCard }] }]}
     >
       <ModalCard 
@@ -45,16 +48,27 @@ const Task: React.FC = (props: any) => {
           setShowModal(false)
         }}
         onEdit = {() => {
+          setFocus()
           setShowModal(false)
         }}
-        onDelete = {() => {
+        onDelete = {async() => {
           setShowModal(false)
-          deleteTask(id)
           removeNotification(id)
+          if(connect.type == 'local'){
+            await deleteLocalTask(props.data)
+            onRefresh && onRefresh()
+          }else{
+            deleteTask(id)
+          }
         }}
-        onActive = {() => {
+        onActive = {async() => {
           setShowModal(false)
-          changeStatus(id,status)
+          if(connect.type == 'local'){
+            await changeStatusLocal(props.data)
+            onRefresh && onRefresh()
+          }else{
+            await changeStatus(id,status)
+          }
         }}
         status = {status}
       />
@@ -92,10 +106,12 @@ const ModalCard = (props: any) => {
         <Icon name = 'delete' size = {size.s100} color = '#ff3636' />
         <Text style = {styles.textModal}>Delete</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress = {() => onEdit()} style = {styles.modalBtn}>
-        <Icon name = 'edit' size = {size.s100} color = '#ffff96' />
-        <Text style = {styles.textModal}>Edit</Text>
-      </TouchableOpacity>
+      {status < 2 && 
+        <TouchableOpacity onPress = {() => onEdit()} style = {styles.modalBtn}>
+          <Icon name = 'edit' size = {size.s100} color = '#ffff96' />
+          <Text style = {styles.textModal}>Edit</Text>
+        </TouchableOpacity>
+      }
       {status < 2 && 
         <TouchableOpacity onPress = {() => onActive(false)} style = {styles.modalBtn}>
           <Icon name = 'check' size = {size.s100} color = '#0dff29' />

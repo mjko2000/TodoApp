@@ -25,10 +25,10 @@ const App: React.FC = (props) => {
         <Stack.Screen name="Route" children = {props => 
           <Tab.Navigator sceneAnimationEnabled = {true} shifting = {true}>
             <Tab.Screen name="Task" options = {{tabBarIcon:({color}) => <Icon name="tasks" size={size.s50} color={color} />}}>
-              {props => 
+              {propsTab => 
                 <>
                   <StatusBar translucent = {true} barStyle = 'dark-content' backgroundColor = 'transparent' />
-                  <TaskContainer />
+                  <TaskContainer {...props} />
                 </>
               }
             </Tab.Screen>
