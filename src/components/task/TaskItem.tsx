@@ -3,14 +3,14 @@ import { Easing, StyleSheet, View, Text, TextInput, TouchableOpacity, Animated }
 import size from '../../res/assert/size'
 import { useSelector, useDispatch } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import {deleteTask, changeStatus} from '../../api/taskFirebase'
-import {changeStatusLocal, deleteLocalTask} from '../../api/getTaskLocal'
-import {removeNotification} from '../../Notification'
+import { deleteTask, changeStatus } from '../../api/taskFirebase'
+import { changeStatusLocal, deleteLocalTask } from '../../api/getTaskLocal'
+import { removeNotification } from '../../Notification'
 import { connect } from '../../config/setting';
 const AnimatedTouch = Animated.createAnimatedComponent(TouchableOpacity)
 const Task: React.FC = (props: any) => {
-  const {index, onRefresh, setFocus} = props
-  const { title, id, fromTime, toTime, time, rate, note, status  } = props.data
+  const { index, onRefresh, setFocus } = props
+  const { title, id, fromTime, toTime, time, rate, note, status } = props.data
   const fromDate = new Date(fromTime)
   const toDate = new Date(toTime)
   const user = useSelector((state: any) => state.loginReducer.user);
@@ -32,58 +32,58 @@ const Task: React.FC = (props: any) => {
         easing: Easing.bounce,
         duration: 300,
         useNativeDriver: false
-      }).start(() => {})
+      }).start(() => { })
     })
   }
 
 
   return (
     <AnimatedTouch
-      onPress = {() => bounce()}
+      onPress={() => bounce()}
       style={[styles.container, { transform: [{ scale: animCard }] }]}
     >
-      <ModalCard 
-        show={showModal} 
-        onCancel = {() => {
+      <ModalCard
+        show={showModal}
+        onCancel={() => {
           setShowModal(false)
         }}
-        onEdit = {() => {
+        onEdit={() => {
           setFocus()
           setShowModal(false)
         }}
-        onDelete = {async() => {
+        onDelete={async () => {
           setShowModal(false)
           removeNotification(id)
-          if(connect.type == 'local'){
+          if (connect.type == 'local') {
             await deleteLocalTask(props.data)
             onRefresh && onRefresh()
-          }else{
+          } else {
             deleteTask(id)
           }
         }}
-        onActive = {async() => {
+        onActive={async () => {
           setShowModal(false)
-          if(connect.type == 'local'){
+          if (connect.type == 'local') {
             await changeStatusLocal(props.data)
             onRefresh && onRefresh()
-          }else{
-            await changeStatus(id,status)
+          } else {
+            await changeStatus(id, status)
           }
         }}
-        status = {status}
+        status={status}
       />
-      <View style = {{flex:1, flexDirection: 'row'}}>
-        <View 
-          style = {[styles.leftColor, {backgroundColor: rate == 0 ? '#3dc2ff' : rate == 1 ? '#ffa436' : 'red'}]}
+      <View style={{ flex: 1, flexDirection: 'row' }}>
+        <View
+          style={[styles.leftColor, { backgroundColor: rate == 0 ? '#3dc2ff' : rate == 1 ? '#ffa436' : 'red' }]}
         />
-        <View style = {{flex:1, margin: size.s20}}>
-          <Text style = {styles.text}>
+        <View style={{ flex: 1, margin: size.s20 }}>
+          <Text style={styles.text}>
             {fromDate.getHours()}:{fromDate.getMinutes()} - {toDate.getHours()}:{toDate.getMinutes()} {timeToText(fromDate)}
           </Text>
-          <Text style = {styles.title}>{title}</Text>
-          <View style = {{flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text style = {[styles.text, {maxWidth: '80%'}]} numberOfLines = {4}>{note}</Text>
-            <Text style = {styles.statusText}>
+          <Text style={styles.title}>{title}</Text>
+          <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text style={[styles.text, { maxWidth: '80%' }]} numberOfLines={4}>{note}</Text>
+            <Text style={styles.statusText}>
               {status == 0 ? 'Idle' : status == 1 ? 'Doing' : 'Done'}
             </Text>
           </View>
@@ -96,29 +96,29 @@ const Task: React.FC = (props: any) => {
 const ModalCard = (props: any) => {
   const { show, onDelete, onEdit, onActive, onCancel, status } = props
   return (
-    show ? 
-    <TouchableOpacity style = {styles.modalContent}>
-      <TouchableOpacity onPress = {() => onCancel()} style = {styles.modalBtn}>
-        <Icon name = 'cancel' size = {size.s100} color = '#bdbdbd' />
-        <Text style = {styles.textModal}>Cancel</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style = {styles.modalBtn} onPress = {() => onDelete()} >
-        <Icon name = 'delete' size = {size.s100} color = '#ff3636' />
-        <Text style = {styles.textModal}>Delete</Text>
-      </TouchableOpacity>
-      {status < 2 && 
-        <TouchableOpacity onPress = {() => onEdit()} style = {styles.modalBtn}>
-          <Icon name = 'edit' size = {size.s100} color = '#ffff96' />
-          <Text style = {styles.textModal}>Edit</Text>
+    show ?
+      <TouchableOpacity style={styles.modalContent}>
+        <TouchableOpacity onPress={() => onCancel()} style={styles.modalBtn}>
+          <Icon name='cancel' size={size.s100} color='#bdbdbd' />
+          <Text style={styles.textModal}>Cancel</Text>
         </TouchableOpacity>
-      }
-      {status < 2 && 
-        <TouchableOpacity onPress = {() => onActive(false)} style = {styles.modalBtn}>
-          <Icon name = 'check' size = {size.s100} color = '#0dff29' />
-          <Text style = {styles.textModal}>Active</Text>
+        <TouchableOpacity style={styles.modalBtn} onPress={() => onDelete()} >
+          <Icon name='delete' size={size.s100} color='#ff3636' />
+          <Text style={styles.textModal}>Delete</Text>
         </TouchableOpacity>
-      }
-    </TouchableOpacity> : null
+        {status < 2 &&
+          <TouchableOpacity onPress={() => onEdit()} style={styles.modalBtn}>
+            <Icon name='edit' size={size.s100} color='#ffff96' />
+            <Text style={styles.textModal}>Edit</Text>
+          </TouchableOpacity>
+        }
+        {status < 2 &&
+          <TouchableOpacity onPress={() => onActive(false)} style={styles.modalBtn}>
+            <Icon name='check' size={size.s100} color='#0dff29' />
+            <Text style={styles.textModal}>Active</Text>
+          </TouchableOpacity>
+        }
+      </TouchableOpacity> : null
   )
 }
 
@@ -154,13 +154,13 @@ const styles = StyleSheet.create({
     elevation: 14,
   },
   modalContent: {
-    width:'100%',
-    height:'100%', 
-    borderRadius: size.s40, 
-    flexDirection: 'row', 
-    justifyContent: 'space-evenly', 
-    alignItems: 'center', 
-    position: 'absolute', 
+    width: '100%',
+    height: '100%',
+    borderRadius: size.s40,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    position: 'absolute',
     zIndex: 1,
     backgroundColor: '#00000090'
   },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     fontFamily: 'OpenSans-Regular',
     color: '#737373'
   },
-  textModal:{
+  textModal: {
     fontFamily: 'OpenSans-Regular',
     color: 'white'
   },
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   },
   leftColor: {
     height: '100%',
-    width: '7%', 
+    width: '7%',
     backgroundColor: 'red',
     borderTopLeftRadius: size.s40,
     borderBottomLeftRadius: size.s40
